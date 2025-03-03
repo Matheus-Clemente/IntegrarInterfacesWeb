@@ -1,3 +1,5 @@
+const { Schema, model } = require('mongoose');
+
 const pedidoSchema = new Schema({
     usuario: { type: Schema.Types.ObjectId, ref: 'Usuario', required: true },
     produtos: [{

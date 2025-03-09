@@ -6,8 +6,10 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 require('./database/db'); // Conectar ao banco de dados
 
-// Importar as rotas da API REST
+// Importar as rotas REST
 const authRotas = require('./routes/authRotas');
+const produtoRotas = require('./routes/produtoRotas');
+const pedidoRotas = require('./routes/pedidoRotas');
 
 // Importar GraphQL TypeDefs e Resolvers
 const typeDefs = require('./graphql/typeDefs');
@@ -21,6 +23,8 @@ app.use(bodyParser.json());
 
 // Configurar rotas REST
 app.use('/api/autenticacao', authRotas);
+app.use('/api', produtoRotas);
+app.use('/api', pedidoRotas);
 
 // Criar servidor Apollo para GraphQL
 const servidorApollo = new ApolloServer({

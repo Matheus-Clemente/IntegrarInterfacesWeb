@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { criarInfo, obterInfo, atualizarInfo, deletarInfo } = require('../controllers/infoController');
-const { protegerRota } = require('../middleware/authMiddleware');
+const WithAuth = require('../middleware/authMiddleware');
 
-router.post('/info', protegerRota, criarInfo); 
+router.post('/info', WithAuth, criarInfo); 
 router.get('/info/:produtoId', obterInfo); 
-router.put('/info/:produtoId', protegerRota, atualizarInfo); 
-router.delete('/info/:produtoId', protegerRota, deletarInfo); 
+router.put('/info/:produtoId', WithAuth, atualizarInfo); 
+router.delete('/info/:produtoId', WithAuth, deletarInfo); 
 
 module.exports = router;

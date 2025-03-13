@@ -1,77 +1,72 @@
-const Pedido = require('../model/Pedido'); // Importa o modelo de Pedido
+const Pedido = require('../model/Pedido');
+const Produto = require('../model/Produto');
 
-// Função para criar um novo pedido
 exports.criarPedido = async (req, res) => {
   try {
-    const { usuarioId, produtos } = req.body; // Obtém os dados do pedido do corpo da requisição
-    const total = await calcularTotalPedido(produtos); // Calcula o valor total do pedido
+    const { usuarioId, produtos } = req.body;
 
-    // Cria um novo pedido
+    const total = await calcularTotalPedido(produtos);
+
     const pedido = new Pedido({
       usuario: usuarioId,
-      produtos: produtos.map(p => ({ // Mapeia os produtos para a estrutura correta
+      produtos: produtos.map(p => ({
         produto: p.produtoId,
         quantidade: p.quantidade
       })),
       total,
-      status: 'pendente' // Define o status inicial do pedido como "pendente"
+      status: 'pendente'
     });
 
-    await pedido.save(); // Salva o pedido no banco de dados
-    res.status(201).json(pedido); // Retorna o pedido criado
+    await pedido.save();
+    res.status(201).json(pedido);
   } catch (erro) {
-    res.status(400).json({ erro: erro.message }); // Retorna erro em caso de falha
+    res.status(400).json({ erro: erro.message });
   }
 };
 
-// Função para listar todos os pedidos
 exports.listarPedidos = async (req, res) => {
   try {
-    const pedidos = await Pedido.find()
-      .populate('usuario') // Popula os dados do usuário associado ao pedido
-      .populate('produtos.produto'); // Popula os dados dos produtos no pedido
-    res.json(pedidos); // Retorna a lista de pedidos
+    const pedidos = await Pedido.find().populate('usuario').populate('produtos.produto');
+    res.json(pedidos);
   } catch (erro) {
-    res.status(500).json({ erro: erro.message }); // Retorna erro caso ocorra um problema
+    res.status(500).json({ erro: erro.message });
   }
 };
 
-// Função para atualizar um pedido existente
 exports.atualizarPedido = async (req, res) => {
   try {
-    const { id } = req.params; // Obtém o ID do pedido da URL
-    const pedidoAtualizado = await Pedido.findByIdAndUpdate(id, req.body, { new: true }); // Atualiza o pedido
+    const { id } = req.params;
+    const pedidoAtualizado = await Pedido.findByIdAndUpdate(id, req.body, { new: true });
     if (!pedidoAtualizado) {
       return res.status(404).json({ erro: 'Pedido não encontrado' });
     }
-    res.json(pedidoAtualizado); // Retorna o pedido atualizado
+    res.json(pedidoAtualizado);
   } catch (erro) {
-    res.status(500).json({ erro: erro.message }); // Retorna erro caso ocorra falha
+    res.status(500).json({ erro: erro.message });
   }
 };
 
-// Função para excluir um pedido
 exports.deletarPedido = async (req, res) => {
   try {
-    const { id } = req.params; // Obtém o ID do pedido da URL
-    const pedidoRemovido = await Pedido.findByIdAndDelete(id); // Remove o pedido do banco de dados
+    const { id } = req.params;
+    const pedidoRemovido = await Pedido.findByIdAndDelete(id);
     if (!pedidoRemovido) {
       return res.status(404).json({ erro: 'Pedido não encontrado' });
     }
-    res.json({ mensagem: 'Pedido removido com sucesso' }); // Retorna mensagem de sucesso
+    res.json({ mensagem: 'Pedido removido com sucesso' });
   } catch (erro) {
-    res.status(500).json({ erro: erro.message }); // Retorna erro caso ocorra falha
+    res.status(500).json({ erro: erro.message });
   }
 };
 
-// Função auxiliar para calcular o total do pedido
+// Função para calcular o total do pedido
 async function calcularTotalPedido(produtos) {
   let total = 0;
   for (const item of produtos) {
-    const produto = await Produto.findById(item.produtoId); // Busca o produto no banco de dados
+    const produto = await Produto.findById(item.produtoId);
     if (produto) {
-      total += produto.preco * item.quantidade; // Multiplica o preço pela quantidade e soma ao total
+      total += produto.preco * item.quantidade;
     }
   }
-  return total; // Retorna o valor total do pedido
+  return total;
 }
